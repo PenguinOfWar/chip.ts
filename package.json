@@ -19,6 +19,7 @@
   },
   "homepage": "https://penguinofwar.github.io/chip.ts",
   "devDependencies": {
+    "@bagofholding/is-client": "^0.4.0",
     "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^11.2.5",
     "@testing-library/user-event": "^12.8.3",
@@ -26,6 +27,7 @@
     "@types/node": "^12.20.5",
     "@types/react": "^17.0.3",
     "@types/react-dom": "^17.0.2",
+    "axios": "^0.21.1",
     "bootstrap": "^5.0.0-beta2",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-prettier": "^3.3.1",
