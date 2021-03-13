@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import isClient from '@bagofholding/is-client';
 
 import request from 'axios';
@@ -9,6 +9,7 @@ import './App.scss';
 
 function App() {
   const [booted, setBooted] = useState(false);
+  const canvas = useRef(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -26,7 +27,7 @@ function App() {
       const blob = new Blob([response.data]);
       const buffer = await blob.arrayBuffer();
       const rom = new Uint8Array(buffer);
-      const chip = new Chip(rom);
+      const chip = new Chip(rom, canvas);
 
       console.log(chip);
     }
@@ -35,16 +36,17 @@ function App() {
       return;
     }
 
-    if (isClient()) {
+    if (isClient() && canvas && canvas?.current) {
       fetchData();
     }
-  }, [booted]);
+  }, [booted, canvas]);
 
   return (
     <div className="container app">
       <div className="row">
         <div className="col-12">
           <h1>CHIP.ts</h1>
+          <canvas data-testid="canvas" ref={canvas} />
         </div>
       </div>
     </div>

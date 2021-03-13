@@ -8,52 +8,35 @@
 export default class Cpu {
   /**
    * CHIP-8 has 4096 8-bit (1 byte) memory locations
-   * A byte will be the smallest addressable location for this exercise
-   * Each byte can be 0 or 1
+   * A byte is normally the smallest addressable location
+   * Each byte can be a value of 0-255
    *
    * Our 4096 decimal can expressed as 0x1000 in hexadecimal
    * We will create a new ArrayBuffer and pass it to Uint8Array (unsigned integer with a range of 0-255)
    * Array buffer will handle our raw data for us e.g. 0x1000 => 4096
    */
 
-  public memory = new Uint8Array(new ArrayBuffer(0x1000));
+  memory = new Uint8Array(new ArrayBuffer(0x1000));
 
   /**
    * CHIP-8 has 16 8-bit data registers named V0 to VF
    * We create a new Uint8Array with 16 register locations
    */
 
-  public registers = new Uint8Array(16);
+  registers = new Uint8Array(16);
 
   /**
    * Our stack will need to store return addresses
    * We will need 16 of these 16-bit addresses
    */
 
-  public stack = new Uint16Array(16);
+  stack = new Uint16Array(16);
 
   /**
    * Our stack pointer will store where in our 16 length stack we should be
    */
 
-  public stackPointer = 0;
-
-  /**
-   * Here we configure graphics and sound
-   * CHIP-8 has a display resolution of 64x32
-   */
-
-  public resolution = {
-    x: 64,
-    y: 32
-  };
-
-  /**
-   * Our screen space will be an array representing pixels
-   * left to right, top to bottom, 8-bits (1-byte) each
-   */
-
-  public screen = new Uint8Array(this.resolution.x * this.resolution.y);
+  stackPointer = 0;
 
   /**
    * We need to define our program counter
@@ -62,7 +45,7 @@ export default class Cpu {
    * We'll store font data there later
    */
 
-  public counter = 0x200;
+  counter = 0x200;
 
   constructor(rom: Uint8Array) {
     this.load(rom);
@@ -146,6 +129,7 @@ export default class Cpu {
      * this yields a00 hex / 2560 decimal
      *
      * we then shift the result over 8 places right yielding a hex / 10 decimal
+     * giving us our register address for later!
      *
      * do similar for y taking 27136 and giving it 0x0000 hex / 0 decimal and go god i keep flopping back and forth
      * it's all hex i swear just different hex and i will tidy it up just look at the decimals
@@ -176,14 +160,50 @@ export default class Cpu {
      * continuing with the above we have 27138 & 61440 = 24576 decimal / 0x6000 hex
      *
      * this corresponds to opcode 6XNN!
+     * https://en.wikipedia.org/wiki/CHIP-8#Opcode_table
+     *
+     * this is called checking the first nibble of the byte
      */
 
     switch (opcode & 0xf000) {
+      /**
+       * This can be a few things but we only really care about two of them - 00E0 and 00EE
+       */
+      case 0x0000: {
+        switch (opcode) {
+          /**
+           * 00E0 / disp_clear() - clears the screen
+           */
+          case 0x00e0:
+            // this.renderer.clear();
+            // for (var i = 0; i < this.display.length; i++) {
+            //   this.display[i] = 0;
+            // }
+            console.log('Render clear');
+            break;
+
+          // RET
+          // 00EE
+          // Return from subroutine.
+          case 0x00ee:
+            // this.pc = this.stack[--this.sp];
+            console.log('Return from subroutine');
+            break;
+        }
+        break;
+      }
+      /**
+       * 6XNN - Sets VX to NN
+       * opcode AND 0xFF hex / 255 dec = 2 dec / 02 hex
+       * therefore register 10 now has a value of two
+       */
       case 0x6000: {
-        console.log('Setting VX to NN');
+        console.log('Setting VX to NN', x, opcode & 0xff);
+        this.registers[x] = opcode & 0xff;
         break;
       }
       default: {
+        // throw new Error(`Unknown opcode: ${opcode.toString(16)}`);
       }
     }
   }
