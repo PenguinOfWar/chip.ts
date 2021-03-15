@@ -61,3 +61,5 @@ Your app is ready to be deployed!
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
+## Resources
+[0](https://en.wikipedia.org/wiki/CHIP-8) | [1](https://github.com/alexanderdickson/Chip-8-Emulator/blob/5da6ac6a4753462d02ca7fe8d5a9398308b8d9d0/scripts/chip8.js#L193) | [2](https://github.com/eshyong/Chip-8-Emulator/blob/master/chip8.c) | [3](https://github.com/leemorgan/Chip8)
