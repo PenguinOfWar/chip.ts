@@ -1,4 +1,8 @@
-# Getting Started with Create React App
+# CHIP.ts
+
+A CHIP-8 emulator in TypeScript.
+
+[![Unit Tests](https://github.com/PenguinOfWar/chip.ts/actions/workflows/unit-test.yml/badge.svg)](https://github.com/PenguinOfWar/chip.ts/actions/workflows/unit-test.yml) [![CodeQL](https://github.com/PenguinOfWar/chip.ts/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/PenguinOfWar/chip.ts/actions/workflows/codeql-analysis.yml) [![GitHub Pages](https://github.com/PenguinOfWar/chip.ts/actions/workflows/gh-pages.yml/badge.svg)](https://github.com/PenguinOfWar/chip.ts/actions/workflows/gh-pages.yml)
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
