@@ -557,7 +557,6 @@ export default class Cpu {
        * DXYN / draw(Vx,Vy,N) - Draws a sprite at coordinate (VX, VY) that has a width of 8 pixels and a height of N+1 pixels.
        */
       case 0xd000: {
-        console.log(this.counter, 'Drawing');
         const height = opcode & 0x000f;
 
         /**
@@ -572,38 +571,44 @@ export default class Cpu {
 
         this.screen[this.counter] = 1;
 
-        const ands = [128, 64, 32, 16, 8, 4, 2, 1];
-
         // set carry flag to 0
         this.registers[0xf] = 0;
-        // drawing loop
-        for (let horizontal = 0; horizontal < height; horizontal++) {
+
+        console.log(this.counter, 'Drawing', coordinates, height);
+
+        let spr;
+
+        /**
+         * drawing loop
+         * try not to get it backwards like i did
+         */
+        for (let vertical = 0; vertical < height; vertical++) {
+          spr = this.memory[this.pointer + vertical];
+          console.log(spr, this.pointer, vertical);
+
           for (
-            let vertical = 0;
-            vertical < this.gfx.resolution.scale;
-            vertical++
+            let horizontal = 0;
+            horizontal < this.gfx.resolution.scale;
+            horizontal++
           ) {
-            if (coordinates.x + vertical === this.gfx.resolution.x) {
-              coordinates.x = -vertical;
+            if (coordinates.x + horizontal === this.gfx.resolution.x) {
+              coordinates.x = -horizontal;
             }
-            if (coordinates.y + horizontal === this.gfx.resolution.y) {
-              coordinates.y = -horizontal;
-            }
-
-            const screenPos =
-              coordinates.x + (coordinates.y * this.gfx.resolution.scale); //prettier-ignore
-
-            const spriteCheck =
-              (this.memory[this.pointer + horizontal] & ands[vertical]) >>
-              (8 - vertical - 1);
-
-            // set carry flag to 1 if a sprite changes from set to unset
-            if (this.screen[screenPos] === 1 && spriteCheck === 1) {
-              this.registers[0xf] = 1;
+            if (coordinates.y + vertical === this.gfx.resolution.y) {
+              coordinates.y = -vertical;
             }
 
-            // bitwise operations decode each bit of sprite and XOR with the current pixel on screen
-            this.screen[screenPos] = this.screen[screenPos] ^ spriteCheck;
+            if ((spr & 0x80) > 0) {
+              if (
+                this.setPixel(
+                  this.registers[x] + horizontal,
+                  this.registers[y] + vertical
+                )
+              ) {
+                this.registers[0xf] = 1;
+              }
+            }
+            spr <<= 1;
           }
           coordinates.x = this.registers[x];
           coordinates.y = this.registers[y];
@@ -814,6 +819,34 @@ export default class Cpu {
 
   setKey(key: number) {
     this.keys[key] = true;
+  }
+
+  /**
+   * do our set pixel handling here
+   */
+  setPixel(x: number, y: number) {
+    const width = this.gfx.resolution.x;
+    const height = this.gfx.resolution.y;
+
+    // If the pixel exceeds the dimensions,
+    // wrap it back around.
+    if (x > width) {
+      x -= width;
+    } else if (x < 0) {
+      x += width;
+    }
+
+    if (y > height) {
+      y -= height;
+    } else if (y < 0) {
+      y += height;
+    }
+
+    const location = x + y * width;
+
+    this.display[location] ^= 1;
+
+    return !this.screen[location];
   }
 }
 

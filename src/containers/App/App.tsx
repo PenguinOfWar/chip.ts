@@ -11,7 +11,7 @@ function App() {
   const [booted, setBooted] = useState(false);
   const canvas = useRef(null);
 
-  const config = { fps: 10 };
+  const config = { fps: 60 };
   const { fps } = config;
   const [state, setState] = useState(config);
 
@@ -23,7 +23,7 @@ function App() {
        * we have retired it here in favour of axios
        */
       const response = await request({
-        url: `${process.env.PUBLIC_URL}/roms/brix`,
+        url: `${process.env.PUBLIC_URL}/roms/pong`,
         method: 'GET',
         responseType: 'blob'
       });
