@@ -19,14 +19,31 @@ export default class Chip {
   frame = 0;
 
   /**
+   * stub our cpu and gfx so we can access them publicly
+   */
+
+  public cpu;
+  public gfx;
+
+  /**
    * i couldnt figure out how to make typescript happy with canvas so i've checked it can't be null up the chain - bit risky tho
    *
    * @param rom - a CHIP-8 rom file as a Uint8Array
    * @param canvas - an html canvas element for our renderer
    */
 
-  constructor(rom: Uint8Array, canvas: any) {
-    this.start(new Cpu(rom), new Gfx(canvas));
+  constructor(rom: Uint8Array, canvas: any, fps?: number) {
+    const gfx = new Gfx(canvas);
+    const cpu = new Cpu(rom, gfx);
+
+    if (fps) {
+      this.fps = fps;
+    }
+
+    this.cpu = cpu;
+    this.gfx = gfx;
+
+    this.start(cpu, gfx);
   }
 
   /**
@@ -59,8 +76,10 @@ export default class Chip {
          * Code within this block is executed once per frame
          */
 
-        cpu.tick();
-        // gfx.paint();
+        cpu.next();
+
+        const screen = cpu.display;
+        gfx.paint(screen);
       }
     };
 
@@ -68,7 +87,6 @@ export default class Chip {
      * Once started the animateLoop function will call itself recursively
      */
 
-    gfx.paint();
     this.frame = requestAnimationFrame(animateLoop);
   }
 

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import isClient from '@bagofholding/is-client';
-
+import { Field, Form, Formik } from 'formik';
 import request from 'axios';
+import isClient from '@bagofholding/is-client';
 
 import Chip from '../../libs/chip/chip';
 
@@ -11,6 +11,10 @@ function App() {
   const [booted, setBooted] = useState(false);
   const canvas = useRef(null);
 
+  const config = { fps: 10 };
+  const { fps } = config;
+  const [state, setState] = useState(config);
+
   useEffect(() => {
     async function fetchData() {
       setBooted(true);
@@ -19,7 +23,7 @@ function App() {
        * we have retired it here in favour of axios
        */
       const response = await request({
-        url: `${process.env.PUBLIC_URL}/roms/pong`,
+        url: `${process.env.PUBLIC_URL}/roms/brix`,
         method: 'GET',
         responseType: 'blob'
       });
@@ -27,9 +31,9 @@ function App() {
       const blob = new Blob([response.data]);
       const buffer = await blob.arrayBuffer();
       const rom = new Uint8Array(buffer);
-      const chip = new Chip(rom, canvas);
+      const chip = new Chip(rom, canvas, fps);
 
-      console.log(chip);
+      window.chip = chip;
     }
 
     if (booted) {
@@ -39,18 +43,49 @@ function App() {
     if (isClient() && canvas && canvas?.current) {
       fetchData();
     }
-  }, [booted, canvas]);
+  }, [booted, canvas, fps]);
 
   return (
     <div className="container app">
       <div className="row">
-        <div className="col-12">
+        <div className="col-12 text-center">
           <h1>CHIP.ts</h1>
           <canvas data-testid="canvas" ref={canvas} />
         </div>
       </div>
+
+      <Formik
+        initialValues={{ ...state }}
+        onSubmit={values => setState(values)}
+      >
+        <Form className="row g-3 justify-content-lg-center">
+          <div className="col-2 text-center form-floating">
+            <Field
+              className="form-control"
+              type="number"
+              name="fps"
+              id="fps"
+              min="0"
+            />
+            <label htmlFor="fps" className="text-dark">
+              Frame rate
+            </label>
+          </div>
+          <div className="col-2 text-center">
+            <button className="btn btn-primary" type="submit">
+              Submit
+            </button>
+          </div>
+        </Form>
+      </Formik>
     </div>
   );
+}
+
+declare global {
+  interface Window {
+    chip: Chip;
+  }
 }
 
 export default App;

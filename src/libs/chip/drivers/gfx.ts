@@ -7,6 +7,16 @@
 
 export default class Gfx {
   /**
+   * we get 2 whole colours to play with here
+   * our background will be black and our foreground classic monochrome green
+   */
+
+  colors = {
+    background: '#000',
+    foreground: '#00ff00'
+  };
+
+  /**
    * This class will receive input from a buffer and draw a new screen
    * Canvas is convenient and cool so we'll use that
    */
@@ -25,13 +35,6 @@ export default class Gfx {
     y: 32,
     scale: 8
   };
-
-  /**
-   * Our screen space will be an array representing pixels
-   * left to right, top to bottom, 8-bits (1-byte) each
-   */
-
-  public screen = new Uint8Array(this.resolution.x * this.resolution.y);
 
   /**
    * giving up and resorting to any type
@@ -72,7 +75,7 @@ export default class Gfx {
       );
   }
 
-  public paint() {
+  public paint(screen: Uint8Array) {
     /**
      * Start every render by clearing the screen
      */
@@ -82,12 +85,29 @@ export default class Gfx {
       const context = this.context;
       const resolution = this.resolution;
 
-      this.screen.map((pixel, position) => {
+      screen.map((pixel, position) => {
+        /**
+         * return the remainder of the position and get multiply it by our scale to get our x/y position
+         */
         const x = (position % resolution.x) * resolution.scale;
         const y = Math.floor(position / resolution.x) * resolution.scale;
 
-        context.fillStyle = ['#000', '#00ff00'][pixel];
+        /**
+         * our pixel is either on or off (0 or 1) so here we present an array with two options
+         * off is 0 or background color
+         * on is 1 or foreground color
+         */
+
+        context.fillStyle = [this.colors.background, this.colors.foreground][
+          pixel
+        ];
+
+        /**
+         * at our x and y coordinate paint a a square matching our scale size and fill color
+         */
+
         context.fillRect(x, y, this.resolution.scale, this.resolution.scale);
+
         return pixel;
       });
     }
