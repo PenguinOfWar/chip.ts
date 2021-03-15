@@ -80,8 +80,7 @@ export default class Cpu {
   soundTimer = 0;
 
   /**
-   * We need a key-value store for CHIP-8
-   * We can just use a plain object for this
+   * Keypad - used as input from a HEX keypad
    */
 
   keys: IKeys = {};
@@ -98,7 +97,7 @@ export default class Cpu {
    * a boolean will do
    */
 
-  running = false;
+  public running = false;
 
   constructor(rom: Uint8Array, gfx: Gfx) {
     this.gfx = gfx;
@@ -276,7 +275,7 @@ export default class Cpu {
            * 00E0 / disp_clear() - clears the screen
            */
           case 0x00e0:
-            console.log(this.counter, 'Render clear');
+            this.gfx.disp_clear();
             break;
 
           /**
@@ -293,14 +292,6 @@ export default class Cpu {
             if (this.stackPointer > 0) {
               --this.stackPointer;
             }
-
-            console.log(
-              this.counter,
-              'Return from subroutine',
-              this.counter,
-              this.stack,
-              this.stackPointer
-            );
             break;
         }
         break;
@@ -327,15 +318,6 @@ export default class Cpu {
         this.stack[this.stackPointer] = this.counter;
         this.counter = JUMP;
         didJump = true;
-
-        console.log(
-          this.counter,
-          'calling subroutine',
-          JUMP,
-          this.counter,
-          this.stackPointer,
-          this.stack
-        );
         break;
       }
 
@@ -343,9 +325,7 @@ export default class Cpu {
        * 3XNN/if(Vx==NN) - Skips the next instruction if VX equals NN. (Usually the next instruction is a jump to skip a code block)
        */
       case 0x3000: {
-        console.log(this.counter, 'Skip instruction check if VX === NN');
         if (this.registers[x] === NN) {
-          console.log('Skipped');
           this.counter += 2;
         }
         break;
@@ -355,9 +335,7 @@ export default class Cpu {
        * 4XNN/if(Vx!=NN - Skips the next instruction if VX doesn't equal NN. (Usually the next instruction is a jump to skip a code block)
        */
       case 0x4000: {
-        console.log(this.counter, 'Skip instruction check if VX !== NN');
         if (this.registers[x] !== NN) {
-          console.log('Skipped');
           this.counter += 2;
         }
         break;
@@ -367,9 +345,7 @@ export default class Cpu {
        * 5XY0/if(Vx==Vy) - Skips the next instruction if VX equals VY. (Usually the next instruction is a jump to skip a code block)
        */
       case 0x5000: {
-        console.log(this.counter, 'Skip instruction check if VX === VY');
         if (this.registers[x] === this.registers[y]) {
-          console.log('Skipped');
           this.counter += 2;
         }
         break;
@@ -381,7 +357,6 @@ export default class Cpu {
        * therefore register 10 now has a value of two
        */
       case 0x6000: {
-        console.log(this.counter, 'Setting VX to NN', x, opcode & 0xff);
         this.registers[x] = opcode & 0xff;
         break;
       }
@@ -390,7 +365,6 @@ export default class Cpu {
        * 7XNN - Adds NN to VX. (Carry flag is not changed)
        */
       case 0x7000: {
-        console.log(this.counter, 'Adding NN to VX', x, this.registers[x], NN);
         this.registers[x] += NN;
         break;
       }
@@ -405,7 +379,6 @@ export default class Cpu {
            * 8XY0/Vx=Vy - Sets VX to the value of VY.
            */
           case 0x0000: {
-            console.log(this.counter, 'Setting VX to VY');
             this.registers[x] = this.registers[y];
             break;
           }
@@ -414,7 +387,6 @@ export default class Cpu {
            * 8XY1/Vx=Vx|Vy - Sets VX to VX or VY. (Bitwise OR operation)
            */
           case 0x0001: {
-            console.log(this.counter, 'Setting VX to VX or VY');
             this.registers[x] = this.registers[x] | this.registers[y];
             break;
           }
@@ -423,7 +395,6 @@ export default class Cpu {
            * 8XY2/Vx=Vx&Vy - Sets VX to VX and VY. (Bitwise AND operation)
            */
           case 0x0002: {
-            console.log(this.counter, 'Setting VX to VX and VY');
             this.registers[x] = this.registers[x] & this.registers[y];
             break;
           }
@@ -432,7 +403,6 @@ export default class Cpu {
            * 8XY3/Vx=Vx^Vy - Sets VX to VX xor VY.
            */
           case 0x0003: {
-            console.log(this.counter, 'Setting VX to VX xor VY');
             this.registers[x] = this.registers[x] ^ this.registers[y];
             break;
           }
@@ -441,7 +411,6 @@ export default class Cpu {
            * 8XY4/Vx += Vy - Adds VY to VX. VF is set to 1 when there's a carry, and to 0 when there isn't.
            */
           case 0x0004: {
-            console.log(this.counter, 'Adding VY to VX');
             if (this.registers[x] + this.registers[y] > 255) {
               this.registers[0xf] = 1;
             } else {
@@ -455,7 +424,6 @@ export default class Cpu {
            * 8XY5/Vx -= Vy - VY is subtracted from VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
            */
           case 0x0005: {
-            console.log(this.counter, 'Subtracting VY from VX');
             if (this.registers[x] < this.registers[y]) {
               this.registers[0xf] = 0;
             } else {
@@ -469,10 +437,6 @@ export default class Cpu {
            * 8XY6/Vx>>=1 - Stores the least significant bit of VX in VF and then shifts VX to the right by 1.
            */
           case 0x0006: {
-            console.log(
-              this.counter,
-              'Storing least significant bit of VX in VF and right shift'
-            );
             if (this.registers[x] % 2 === 0) {
               this.registers[0xf] = 0;
             } else {
@@ -486,7 +450,6 @@ export default class Cpu {
            * 8XY7/Vx=Vy-Vx - Sets VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
            */
           case 0x0007: {
-            console.log(this.counter, 'Setting VX to VY minus VX');
             if (this.registers[y] < this.registers[x]) {
               this.registers[0xf] = 0;
             } else {
@@ -500,10 +463,6 @@ export default class Cpu {
            * 8XYE/Vx<<=1 - Stores the most significant bit of VX in VF and then shifts VX to the left by 1
            */
           case 0x000e: {
-            console.log(
-              this.counter,
-              'Storing most significant bit of VX in VF and left shift'
-            );
             if (this.registers[x] < 128) {
               this.registers[0xf] = 0;
             } else {
@@ -522,10 +481,21 @@ export default class Cpu {
       }
 
       /**
+       * we (i) forgot about instruction 9
+       * 9XY0/if(Vx!=Vy) - Skips the next instruction if VX doesn't equal VY. (Usually the next instruction is a jump to skip a code block)
+       */
+      case 0x9000: {
+        // skip next instruction if VX not equals VY
+        if (this.registers[x] !== this.registers[y]) {
+          this.counter += 2;
+        }
+        break;
+      }
+
+      /**
        * ANNN - Sets pointer/I to address NNN
        */
       case 0xa000: {
-        console.log(this.counter, 'Setting I Pointer', this.pointer, JUMP);
         this.pointer = JUMP;
         break;
       }
@@ -534,11 +504,6 @@ export default class Cpu {
        * BNNN - Jumps to addres that is sum of NNN and V0 (register 0)
        */
       case 0xb000: {
-        console.log(
-          this.counter,
-          'Jumping to',
-          (opcode & 0xfff) + this.registers[0]
-        );
         this.counter = (opcode & 0xfff) + this.registers[0];
         didJump = true;
         break;
@@ -548,7 +513,6 @@ export default class Cpu {
        * CXNN/Vx=rand()&N - Sets VX to the result of a bitwise and operation on a random number (Typically: 0 to 255) and NN.
        */
       case 0xc000: {
-        console.log(this.counter, 'Setting VX to random number');
         this.registers[x] = Math.floor(Math.random() * 255) % 255 & NN;
         break;
       }
@@ -569,12 +533,8 @@ export default class Cpu {
           y: this.registers[y]
         };
 
-        this.screen[this.counter] = 1;
-
         // set carry flag to 0
         this.registers[0xf] = 0;
-
-        console.log(this.counter, 'Drawing', coordinates, height);
 
         let spr;
 
@@ -584,7 +544,6 @@ export default class Cpu {
          */
         for (let vertical = 0; vertical < height; vertical++) {
           spr = this.memory[this.pointer + vertical];
-          console.log(spr, this.pointer, vertical);
 
           for (
             let horizontal = 0;
@@ -627,9 +586,7 @@ export default class Cpu {
            * EX9E/if(key()==Vx) - Skips the next instruction if the key stored in VX is pressed. (Usually the next instruction is a jump to skip a code block)
            */
           case 0x009e: {
-            console.log(this.counter, 'Checking if a key is pressed');
             if (this.key === this.registers[x]) {
-              console.log('Key press, skipping');
               this.counter += 2;
             }
             break;
@@ -639,9 +596,7 @@ export default class Cpu {
            * EXA1/if(key()!=Vx) - Skips the next instruction if the key stored in VX isn't pressed. (Usually the next instruction is a jump to skip a code block)
            */
           case 0x00a1: {
-            console.log(this.counter, 'Checking if no key is pressed');
             if (this.key !== this.registers[x]) {
-              console.log('No key press, skipping');
               this.counter += 2;
             }
             break;
@@ -664,12 +619,6 @@ export default class Cpu {
            * FX07/get_delay() -	Sets VX to the value of the delay timer.
            */
           case 0x0007: {
-            console.log(
-              this.counter,
-              'Setting VX to delay value',
-              x,
-              this.delayTimer
-            );
             this.registers[x] = this.delayTimer;
             break;
           }
@@ -678,33 +627,20 @@ export default class Cpu {
            * What this means is we are actually going to halt the program and wait until a key is pressed
            */
           case 0x000a: {
-            console.log(this.counter, 'waiting for get_key()');
-            const oldKeyDown = this.setKey;
-            const self = this;
-
-            this.setKey = function (key: number) {
-              self.registers[x] = key;
-
-              self.setKey = oldKeyDown.bind(self);
-              self.setKey.apply(self, [key]);
-
-              self.start();
-            };
-
-            this.stop();
-            return;
+            if (this.key === 0) {
+              this.stop();
+              return;
+            } else {
+              this.registers[x] = this.key;
+              this.start();
+            }
+            break;
           }
 
           /**
            * FX15/delay_timer(Vx) - Sets the delay timer to VX.
            */
           case 0x0015: {
-            console.log(
-              this.counter,
-              'setting delay timer to vx',
-              this.delayTimer,
-              this.registers[x]
-            );
             this.delayTimer = this.registers[x];
             break;
           }
@@ -713,12 +649,6 @@ export default class Cpu {
            * FX18/sound_timer(Vx) - Sets the sound timer to VX.
            */
           case 0x0018: {
-            console.log(
-              this.counter,
-              'setting sound timer to vx',
-              this.soundTimer,
-              this.registers[x]
-            );
             this.soundTimer = this.registers[x];
             break;
           }
@@ -727,7 +657,6 @@ export default class Cpu {
            * X1E - Adds VX to pointer/I. VF is not affected
            */
           case 0x001e: {
-            console.log(this.counter, 'adding vx to pointer');
             this.pointer += this.registers[x];
             break;
           }
@@ -738,12 +667,6 @@ export default class Cpu {
            * we multiply by 5 to get there
            */
           case 0x0029: {
-            console.log(
-              this.counter,
-              'Setting I to sprite location for char in vx',
-              this.pointer,
-              this.registers[x] * 5
-            );
             this.pointer = this.registers[x] * 5;
             break;
           }
@@ -760,13 +683,6 @@ export default class Cpu {
               (this.registers[x] / 10) % 10,
               this.registers[x] % 10
             ];
-            console.log(
-              this.counter,
-              'set_BCD',
-              x,
-              this.registers[x],
-              pointers
-            );
             this.memory[this.pointer] = pointers[0];
             this.memory[this.pointer + 1] = pointers[1];
             this.memory[this.pointer + 2] = pointers[2];
@@ -777,7 +693,6 @@ export default class Cpu {
            * FX55/reg_dump(Vx,&I) - Stores V0 to VX (including VX) in memory starting at address I.
            */
           case 0x0055: {
-            console.log(this.counter, 'reg_dump');
             for (let i = 0; i <= x; i++) {
               this.memory[this.pointer + i] = this.registers[i];
             }
@@ -788,7 +703,6 @@ export default class Cpu {
            * FX65/reg_load(Vx,&I) - Fills V0 to VX (including VX) with values from memory starting at address I.
            */
           case 0x0065: {
-            console.log(this.counter, 'reg_load');
             for (let i = 0; i <= x; i++) {
               this.registers[i] = this.memory[this.pointer + i];
             }
@@ -817,10 +731,6 @@ export default class Cpu {
     return this.screen;
   }
 
-  setKey(key: number) {
-    this.keys[key] = true;
-  }
-
   /**
    * do our set pixel handling here
    */
@@ -847,6 +757,13 @@ export default class Cpu {
     this.display[location] ^= 1;
 
     return !this.screen[location];
+  }
+
+  /**
+   * provide a public api for the keyboard drive to update the key pressed
+   */
+  public input(key: any) {
+    this.key = key;
   }
 }
 

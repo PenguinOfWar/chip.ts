@@ -23,6 +23,7 @@ export default class Gfx {
 
   canvas: any = null;
   context: CanvasRenderingContext2D | null = null;
+  grid = false;
 
   /**
    * Here we configure graphics information
@@ -47,6 +48,10 @@ export default class Gfx {
     this.boot();
   }
 
+  public toggleGrid() {
+    this.grid = !this.grid;
+  }
+
   /**
    * Some basic canvas stuff here we're going to get a 2d canvas context
    * we're going to give the canvas height and width dimension * scale
@@ -60,7 +65,7 @@ export default class Gfx {
     this.disp_clear();
   }
 
-  disp_clear() {
+  public disp_clear() {
     /**
      * man i cannot get typescript to shut the fuck about how this might be null
      * look at all this extra code
@@ -87,7 +92,7 @@ export default class Gfx {
 
       screen.map((pixel, position) => {
         /**
-         * return the remainder of the position and get multiply it by our scale to get our x/y position
+         * return the remainder of the position and multiply it by our scale to get our x/y position
          */
         const x = (position % resolution.x) * resolution.scale;
         const y = Math.floor(position / resolution.x) * resolution.scale;
@@ -102,12 +107,24 @@ export default class Gfx {
           pixel
         ];
 
+        context.strokeStyle = [this.colors.background, this.colors.foreground][
+          pixel
+        ];
+
         /**
          * at our x and y coordinate paint a a square matching our scale size and fill color
          */
 
-        context.fillRect(x, y, this.resolution.scale, this.resolution.scale);
-
+        if (pixel || !this.grid) {
+          context.fillRect(x, y, this.resolution.scale, this.resolution.scale);
+        } else {
+          context.strokeRect(
+            x,
+            y,
+            this.resolution.scale,
+            this.resolution.scale
+          );
+        }
         return pixel;
       });
     }

@@ -7,6 +7,7 @@
 
 import Cpu from './drivers/cpu';
 import Gfx from './drivers/gfx';
+import Keyboard from './drivers/keyboard';
 
 export default class Chip {
   /**
@@ -15,7 +16,7 @@ export default class Chip {
    * Timing function from https://gist.github.com/addyosmani/5434533#gistcomment-2018050
    */
 
-  fps = 60;
+  speed = 100;
   frame = 0;
 
   /**
@@ -24,6 +25,7 @@ export default class Chip {
 
   public cpu;
   public gfx;
+  public keyboard;
 
   /**
    * i couldnt figure out how to make typescript happy with canvas so i've checked it can't be null up the chain - bit risky tho
@@ -32,16 +34,14 @@ export default class Chip {
    * @param canvas - an html canvas element for our renderer
    */
 
-  constructor(rom: Uint8Array, canvas: any, fps?: number) {
+  constructor(rom: Uint8Array, canvas: any) {
     const gfx = new Gfx(canvas);
     const cpu = new Cpu(rom, gfx);
 
-    if (fps) {
-      this.fps = fps;
-    }
-
     this.cpu = cpu;
     this.gfx = gfx;
+
+    this.keyboard = new Keyboard(cpu);
 
     this.start(cpu, gfx);
   }
@@ -54,33 +54,27 @@ export default class Chip {
    */
 
   start(cpu: Cpu, gfx: Gfx) {
+    let working = false;
+
+    setInterval(() => {
+      if (working) {
+        return;
+      }
+
+      working = true;
+      cpu.next();
+      working = false;
+    }, 1000 / this.speed);
+
     /**
-     * I just learned about performance
-     * This is cool
+     * let's start a clock
      */
 
-    let then: number = performance.now();
-
-    const interval = 1000 / this.fps;
-    const tolerance = 0.1;
-
-    const animateLoop = (now: number) => {
+    const animateLoop = () => {
       this.frame = requestAnimationFrame(animateLoop);
 
-      const delta = now - then;
-
-      if (delta >= interval - tolerance) {
-        then = now - (delta % interval);
-
-        /**
-         * Code within this block is executed once per frame
-         */
-
-        cpu.next();
-
-        const screen = cpu.display;
-        gfx.paint(screen);
-      }
+      const screen = cpu.display;
+      gfx.paint(screen);
     };
 
     /**
