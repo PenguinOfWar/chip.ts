@@ -8,6 +8,8 @@
 import Gfx from './gfx';
 import { fonts } from '../assets/characters';
 
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+
 export default class Cpu {
   /**
    * CHIP-8 has 4096 8-bit (1 byte) memory locations
