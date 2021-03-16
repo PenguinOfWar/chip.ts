@@ -9,6 +9,49 @@ import Cpu from './drivers/cpu';
 import Gfx from './drivers/gfx';
 import Keyboard from './drivers/keyboard';
 
+/**
+ * export some common stuff
+ */
+
+export const games = [
+  'Invaders',
+  'Brix',
+  'Tetris',
+  'Pong',
+  'UFO',
+  'IBM',
+  'Missile',
+  'Tank',
+  'Maze'
+];
+
+export const keypad = [
+  ['1', '2', '3', '4'],
+  ['q', 'w', 'e', 'r'],
+  ['a', 's', 'd', 'f'],
+  ['z', 'x', 'c', 'v']
+];
+
+export const instructions: IInstructions = {
+  brix: 'Left: Q | Right: E',
+  tetris: 'Left: W | Right: E | Rotate: Q',
+  pong: 'P1 Up: 1 | P1 Down: Q | P2 Up: 4 | P2 Down: R',
+  ufo: 'Up/Left: Q | Up: W | Up/Right: E',
+  ibm: 'None',
+  invaders: 'Start: W | Shoot: W| Left: Q | Right: R',
+  missile: 'Shoot: S',
+  tank: 'Shoot: W | Left: Q | Up: S | Right: E | Down: 2',
+  maze: 'None'
+};
+
+export interface SpecialCases {
+  [key: string]: any;
+}
+
+export interface IInstructions {
+  [key: string]: string;
+}
+
 export default class Chip {
   /**
    * Configure our preferred target framerate
@@ -16,7 +59,7 @@ export default class Chip {
    * Timing function from https://gist.github.com/addyosmani/5434533#gistcomment-2018050
    */
 
-  speed = 100;
+  speed = 120;
   frame = 0;
 
   /**
@@ -28,13 +71,28 @@ export default class Chip {
   public keyboard;
 
   /**
+   * lets fine tune some specific games
+   * our maximum is 1000
+   */
+
+  specialCases: SpecialCases = {};
+
+  /**
    * i couldnt figure out how to make typescript happy with canvas so i've checked it can't be null up the chain - bit risky tho
    *
    * @param rom - a CHIP-8 rom file as a Uint8Array
    * @param canvas - an html canvas element for our renderer
    */
 
-  constructor(rom: Uint8Array, canvas: any) {
+  constructor(game: string, rom: Uint8Array, canvas: any) {
+    /**
+     * before we do anything check for special cases
+     */
+
+    if (this.specialCases[game.toLowerCase()]) {
+      this.speed = this.specialCases[game.toLowerCase()].speed || this.speed;
+    }
+
     const gfx = new Gfx(canvas);
     const cpu = new Cpu(rom, gfx);
 
@@ -56,6 +114,10 @@ export default class Chip {
   start(cpu: Cpu, gfx: Gfx) {
     let working = false;
 
+    /**
+     * let's start a clock
+     */
+
     setInterval(() => {
       if (working) {
         return;
@@ -65,10 +127,6 @@ export default class Chip {
       cpu.next();
       working = false;
     }, 1000 / this.speed);
-
-    /**
-     * let's start a clock
-     */
 
     const animateLoop = () => {
       this.frame = requestAnimationFrame(animateLoop);

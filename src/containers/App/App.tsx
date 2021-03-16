@@ -3,41 +3,13 @@ import { Field, Form, Formik } from 'formik';
 import request from 'axios';
 import isClient from '@bagofholding/is-client';
 
-import Chip from '../../libs/chip/chip';
+import Chip, { games, keypad, instructions } from '../../libs/chip/chip';
 
 import './App.scss';
 
 function App() {
   const canvas = useRef(null);
 
-  const games = [
-    'Brix',
-    'Tetris',
-    'Pong',
-    'UFO',
-    'IBM',
-    'Invaders',
-    'Missile',
-    'Tank',
-    'Maze'
-  ];
-  const keypad = [
-    ['1', '2', '3', '4'],
-    ['q', 'w', 'e', 'r'],
-    ['a', 's', 'd', 'f'],
-    ['z', 'x', 'c', 'v']
-  ];
-  const instructions: IInstructions = {
-    brix: 'Left: Q | Right: E',
-    tetris: 'Left: W | Right: E | Rotate: Q',
-    pong: 'P1 Up: 1 | P1 Down: Q | P2 Up: 4 | P2 Down: R',
-    ufo: 'Up/Left: Q | Up: W | Up/Right: E',
-    ibm: 'None',
-    invaders: '???',
-    missile: 'Shoot: S',
-    tank: 'Shoot: W | Left: Q | Up: S | Right: E | Down: 2',
-    maze: 'None'
-  };
   const [slot, setSlot] = useState(games[0].toLowerCase());
 
   const fetchData = useCallback(async () => {
@@ -60,7 +32,7 @@ function App() {
     const blob = new Blob([response.data]);
     const buffer = await blob.arrayBuffer();
     const rom = new Uint8Array(buffer);
-    const chip = new Chip(rom, canvas);
+    const chip = new Chip(slot, rom, canvas);
 
     window.chip = chip;
   }, [slot]);
@@ -192,10 +164,6 @@ function App() {
       </Formik>
     </div>
   );
-}
-
-export interface IInstructions {
-  [key: string]: string;
 }
 
 declare global {

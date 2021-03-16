@@ -291,7 +291,7 @@ export default class Cpu {
            * 00E0 / disp_clear() - clears the screen
            */
           case 0x00e0:
-            this.gfx.disp_clear();
+            this.disp_clear();
             break;
 
           /**
@@ -647,10 +647,13 @@ export default class Cpu {
               this.stop();
               return;
             } else {
+              /**
+               * before we start again should we clear the screen ram and pause the rendering there too?
+               */
               this.registers[x] = this.key;
               this.start();
+              break;
             }
-            break;
           }
 
           /**
@@ -814,6 +817,20 @@ export default class Cpu {
     if (this.speaker) {
       this.speaker.close();
     }
+  }
+
+  /**
+   * clear the display
+   */
+  public disp_clear() {
+    /**
+     * feed our paint method an empty screen array and force a new paint
+     */
+
+    const screen = new Uint8Array(
+      this.gfx.resolution.x * this.gfx.resolution.y
+    );
+    this.screen = screen;
   }
 }
 

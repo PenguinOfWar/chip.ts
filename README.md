@@ -14,19 +14,19 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 - Pause the emulator any time
 - Local multiplayer (depending on the game)
 - 60 fps video output to canvas
-- 100hz simulated clock speed
+- Authentic 120hz clockspeed
 - Cutting edge sawtooth audio
 - Desktop keyboard support
 - Mobile and touch support with virtual hex keypad
 
 ## Cartridges
 
+- Invaders
 - Brix
 - Tetris
 - Pong
 - UFO
 - IBM
-- Invaders
 - Missile
 - Tank
 - Maze
