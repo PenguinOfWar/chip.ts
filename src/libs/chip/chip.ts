@@ -84,7 +84,13 @@ export default class Chip {
     this.frame = requestAnimationFrame(animateLoop);
   }
 
-  stop() {
+  /**
+   * shut it all down fellas
+   * only call this if you're about to destroy the class
+   * this ensures event listeners and audio loops are destroyed
+   */
+  public stop() {
     cancelAnimationFrame(this.frame);
+    this.cpu.halt();
   }
 }

@@ -10,7 +10,17 @@ import './App.scss';
 function App() {
   const canvas = useRef(null);
 
-  const games = ['Brix', 'Tetris', 'Pong'];
+  const games = [
+    'Brix',
+    'Tetris',
+    'Pong',
+    'UFO',
+    'IBM',
+    'Invaders',
+    'Missile',
+    'Tank',
+    'Maze'
+  ];
   const keypad = [
     ['1', '2', '3', '4'],
     ['q', 'w', 'e', 'r'],
@@ -20,11 +30,23 @@ function App() {
   const instructions: IInstructions = {
     brix: 'Left: Q | Right: E',
     tetris: 'Left: W | Right: E | Rotate: Q',
-    pong: 'P1 Up: 1 | P1 Down: Q | P2 Up: 4 | P2 Down: R'
+    pong: 'P1 Up: 1 | P1 Down: Q | P2 Up: 4 | P2 Down: R',
+    ufo: 'Up/Left: Q | Up: W | Up/Right: E',
+    ibm: 'None',
+    invaders: '???',
+    missile: 'Shoot: S',
+    tank: 'Shoot: W | Left: Q | Up: S | Right: E | Down: 2',
+    maze: 'None'
   };
   const [slot, setSlot] = useState(games[0].toLowerCase());
 
   const fetchData = useCallback(async () => {
+    /**
+     * check for any instances of chip before we load a rom
+     */
+    if (window.chip) {
+      window.chip.stop();
+    }
     /**
      * sadly superagent does not support blobs in userland
      * we have retired it here in favour of axios
@@ -139,12 +161,14 @@ function App() {
       <Formik
         initialValues={{ slot }}
         onSubmit={values => {
-          setSlot(values.slot);
+          if (values.slot !== slot) {
+            setSlot(values.slot);
+          }
         }}
       >
         <Form className="row justify-content-lg-center">
           <div className="col-12 text-center">
-            <h3>Choose a game</h3>
+            <h3>Choose a cartidge</h3>
             <Field as="select" className="form-control" name="slot">
               {games.map(game => (
                 <option key={game} value={game.toLowerCase()}>

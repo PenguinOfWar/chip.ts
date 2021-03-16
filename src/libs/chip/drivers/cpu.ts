@@ -93,6 +93,13 @@ export default class Cpu {
   key = 0;
 
   /**
+   * we will also need a virtual keyboard and sound adapter
+   */
+
+  speaker = new AudioContext();
+  wave: OscillatorType = 'sawtooth';
+
+  /**
    * We need a way to track whether or not ops should be paused
    * a boolean will do
    */
@@ -184,6 +191,13 @@ export default class Cpu {
     }
 
     if (this.soundTimer > 0) {
+      /**
+       * if the sound timer is exactly 1 fire a beep off
+       */
+      if (this.running && this.soundTimer === 1) {
+        this.beep();
+      }
+
       --this.soundTimer;
     }
 
@@ -764,6 +778,40 @@ export default class Cpu {
    */
   public input(key: any) {
     this.key = key;
+  }
+
+  /**
+   * CHIP-8 has a single voice speaker to beep at you
+   * we'll make a beep method for our cpu (or anyone) to use
+   */
+  public beep() {
+    if (this.speaker) {
+      const oscillator = this.speaker.createOscillator();
+      oscillator.connect(this.speaker.destination);
+      /**
+       * i think sawtooth sounds the most retro and its my code so we're sticking with it
+       * there also seems to be an issue here with the oscillator context hanging around
+       * cant quite figure out how to close it gracefully
+       */
+      oscillator.type = this.wave;
+      oscillator.start();
+      setTimeout(() => {
+        oscillator.stop();
+      }, 100);
+      return;
+    }
+  }
+
+  /**
+   * We need to add a halt procedure here primarily to close the audiocontext
+   * it gets really annoying otherwise as sound loops can get stuck in the browser window
+   * dont ask me how i know this
+   */
+
+  public halt() {
+    if (this.speaker) {
+      this.speaker.close();
+    }
   }
 }
 
