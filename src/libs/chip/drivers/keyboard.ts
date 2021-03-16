@@ -131,7 +131,7 @@ export default class Keyboard {
   }
 
   public release() {
-    this.cpu.input(0x00ff);
+    this.cpu.input(0);
   }
 
   listen() {
@@ -144,7 +144,8 @@ export default class Keyboard {
 
       /**
        * listen for keyup and clear the key register
-       * send it 255 if we're clear
+       * send it 0 if we're clear because why on earth should it be anything but
+       * note to self: when consulting the ancient texts they are not 1-2-1 gospel. ta.
        */
       document.addEventListener('keyup', () => {
         this.release();

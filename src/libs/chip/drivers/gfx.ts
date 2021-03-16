@@ -61,31 +61,9 @@ export default class Gfx {
     this.context = this.canvas.getContext('2d');
     this.canvas.width = this.resolution.x * this.resolution.scale;
     this.canvas.height = this.resolution.y * this.resolution.scale;
-
-    this.disp_clear();
-  }
-
-  public disp_clear() {
-    /**
-     * man i cannot get typescript to shut the fuck about how this might be null
-     * look at all this extra code
-     * i love typescript but she doesnt make it easy
-     */
-    this.context?.clearRect &&
-      this.context.clearRect(
-        0,
-        0,
-        this.resolution.x * this.resolution.scale,
-        this.resolution.y * this.resolution.scale
-      );
   }
 
   public paint(screen: Uint8Array) {
-    /**
-     * Start every render by clearing the screen
-     */
-    this.disp_clear();
-
     if (this.context) {
       const context = this.context;
       const resolution = this.resolution;
