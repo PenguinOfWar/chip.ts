@@ -15,18 +15,25 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 - Local multiplayer (depending on the game)
 - 60 fps video output to canvas
 - 100hz simulated clock speed
+- Cutting edge sawtooth audio
 - Desktop keyboard support
 - Mobile and touch support with virtual hex keypad
 
-## Games
+## Cartridges
 
 - Brix
 - Tetris
 - Pong
+- UFO
+- IBM
+- Invaders
+- Missile
+- Tank
+- Maze
 
 ## Backlog
 
-- Sound output
+- Game specific optimisations
 - User controls for color, frame rate and clock speed
 - Frame counter
 - Rewind frame by frame
