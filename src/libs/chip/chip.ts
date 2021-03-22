@@ -59,7 +59,7 @@ export default class Chip {
    * Timing function from https://gist.github.com/addyosmani/5434533#gistcomment-2018050
    */
 
-  speed = 120;
+  speed = 60;
   frame = 0;
 
   /**
