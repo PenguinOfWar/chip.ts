@@ -14,8 +14,8 @@ import Keyboard from './drivers/keyboard';
  */
 
 export const games = [
-  'Invaders',
   'Brix',
+  'Invaders',
   'Tetris',
   'Pong',
   'UFO',
