@@ -14,7 +14,6 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 - Pause the emulator any time
 - Local multiplayer (depending on the game)
 - 60 fps video output to canvas
-- Authentic 100hz clockspeed
 - Cutting edge sawtooth audio
 - Desktop keyboard support
 - Mobile and touch support with virtual hex keypad
