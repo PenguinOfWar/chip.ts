@@ -20,7 +20,7 @@
   "homepage": "https://penguinofwar.github.io/chip.ts",
   "devDependencies": {
     "@bagofholding/is-client": "^0.6.1",
-    "@testing-library/jest-dom": "^5.11.10",
+    "@testing-library/jest-dom": "^5.12.0",
     "@testing-library/react": "^11.2.6",
     "@testing-library/user-event": "^13.1.9",
     "@types/jest": "^26.0.23",
