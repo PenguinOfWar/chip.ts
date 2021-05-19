@@ -52,6 +52,7 @@
       "react-app/jest",
       "plugin:prettier/recommended"
     ],
+    "ignorePatterns": ["src/polyfills/**/*.js"],
     "rules": {
       "no-var": "error"
     }

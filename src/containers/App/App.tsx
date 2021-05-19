@@ -3,6 +3,7 @@ import { Field, Form, Formik } from 'formik';
 import request from 'axios';
 import isClient from '@bagofholding/is-client';
 
+import arrayBuffer from '../../polyfills/arrayBuffer';
 import Chip, { games, keypad, instructions } from '../../libs/chip/chip';
 
 import './App.scss';
@@ -28,6 +29,13 @@ function App() {
       method: 'GET',
       responseType: 'blob'
     });
+
+    /**
+     * check if we need a fileArray polyfill
+     */
+
+    File.prototype.arrayBuffer = File.prototype.arrayBuffer || arrayBuffer;
+    Blob.prototype.arrayBuffer = Blob.prototype.arrayBuffer || arrayBuffer;
 
     const blob = new Blob([response.data]);
     const buffer = await blob.arrayBuffer();
