@@ -75,6 +75,6 @@
     ]
   },
   "dependencies": {
-    "formik": "^2.2.6"
+    "formik": "^2.2.7"
   }
 }
