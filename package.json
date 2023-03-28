@@ -1,7 +1,7 @@
 {
   "name": "chip.ts",
   "description": "A CHIP-8 emulator in TypeScript",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "private": true,
   "repository": {
     "type": "git",
