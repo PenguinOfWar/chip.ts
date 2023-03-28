@@ -87,7 +87,7 @@ function App() {
       </div>
 
       <div className="row">
-        <div className="col-6 text-center mb-2">
+        <div className="col-12 text-center mb-2">
           <button
             className="btn btn-secondary"
             onClick={() => {
@@ -97,7 +97,7 @@ function App() {
             Pause (Escape / Spacebar)
           </button>
         </div>
-        <div className="col-6 text-center mb-2">
+        <div className="col-6 text-center mb-2 d-none">
           <button
             className="btn btn-secondary"
             onClick={() => {
