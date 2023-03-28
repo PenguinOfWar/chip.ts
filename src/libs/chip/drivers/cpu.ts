@@ -7,6 +7,7 @@
 
 import Gfx from './gfx';
 import { fonts } from '../assets/characters';
+import { IChip, IChipContext } from '../types/chip.types';
 
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 
@@ -170,12 +171,31 @@ export default class Cpu {
    * next will check if the cpu is running and tick if true
    */
 
-  public next() {
+  public next(dispatch: Function, context: IChipContext) {
     if (!this.running) {
       return;
     }
 
     this.tick();
+
+    const buildContext: IChip = {
+      ...context,
+      cpu: {
+        counter: this.counter,
+        delayTimer: this.delayTimer,
+        key: this.key,
+        memory: this.memory,
+        pointer: this.pointer,
+        registers: this.registers,
+        running: this.running,
+        screen: this.screen,
+        soundTimer: this.soundTimer,
+        stack: this.stack,
+        stackPointer: this.stackPointer
+      }
+    };
+
+    dispatch(buildContext);
   }
 
   /**
