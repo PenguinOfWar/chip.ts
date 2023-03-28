@@ -9,7 +9,7 @@ interface IDebugArrayTable {
 }
 
 export default function DebugArrayTable(props: IDebugArrayTable) {
-  const { data, format, columns } = props;
+  const { data, format } = props;
 
   return (
     <div className="debug-array-table">
