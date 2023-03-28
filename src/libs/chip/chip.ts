@@ -8,6 +8,7 @@
 import Cpu from './drivers/cpu';
 import Gfx from './drivers/gfx';
 import Keyboard from './drivers/keyboard';
+import { IChip, IChipContext } from './types/chip.types';
 
 /**
  * export some common stuff
@@ -85,6 +86,8 @@ export default class Chip {
    */
 
   constructor(game: string, rom: Uint8Array, canvas: any) {
+    this.dispatch.bind(this);
+
     /**
      * before we do anything check for special cases
      */
@@ -105,6 +108,25 @@ export default class Chip {
   }
 
   /**
+   * Custom event dispatcher so a 3rd party can listen in on what's happening
+   * under the hood of chip
+   */
+
+  dispatch(context: IChip) {
+    if (CustomEvent instanceof Function) {
+      const data = {
+        cpu: context.cpu,
+        frame: context.frame,
+        speed: context.speed
+      };
+
+      const cpuEvent = new CustomEvent('chipDebug', { detail: data });
+
+      document.dispatchEvent(cpuEvent);
+    }
+  }
+
+  /**
    * start will kick off our timing function
    * this is going to check 60 times per second
    * requestAnimationFrame is a browser API that helps us
@@ -113,6 +135,11 @@ export default class Chip {
 
   start(cpu: Cpu, gfx: Gfx) {
     let working = false;
+
+    const context: IChipContext = {
+      frame: this.frame,
+      speed: this.speed
+    };
 
     /**
      * let's start a clock
@@ -124,7 +151,7 @@ export default class Chip {
       }
 
       working = true;
-      cpu.next();
+      cpu.next(this.dispatch, context);
       working = false;
     }, 1000 / this.speed);
 

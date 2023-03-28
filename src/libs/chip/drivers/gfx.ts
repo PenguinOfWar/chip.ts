@@ -24,6 +24,7 @@ export default class Gfx {
   canvas: any = null;
   context: CanvasRenderingContext2D | null = null;
   grid = false;
+  gridNode?: HTMLImageElement = undefined;
 
   /**
    * Here we configure graphics information
@@ -63,6 +64,41 @@ export default class Gfx {
     this.canvas.height = this.resolution.y * this.resolution.scale;
   }
 
+  public drawGrid() {
+    if (this.context && this.grid) {
+      const context = this.context;
+
+      const data = `<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"> 
+        <defs> 
+            <pattern id="smallGrid" width="8" height="8" patternUnits="userSpaceOnUse"> 
+                <path d="M 8 0 L 0 0 0 8" fill="none" stroke="gray" stroke-width="0.5" /> 
+            </pattern> 
+            <pattern id="grid" width="80" height="80" patternUnits="userSpaceOnUse"> 
+                <rect width="80" height="80" fill="url(#smallGrid)" /> 
+                <path d="M 80 0 L 0 0 0 80" fill="none" stroke="gray" stroke-width="1" /> 
+            </pattern> 
+        </defs> 
+        <rect width="100%" height="100%" fill="url(#smallGrid)" /> 
+    </svg>`;
+
+      const DOMURL = window.URL || window.webkitURL || window;
+
+      const img = new Image();
+      const svg = new Blob([data], { type: 'image/svg+xml;charset=utf-8' });
+      const url = DOMURL.createObjectURL(svg);
+
+      img.onload = function () {
+        context.drawImage(img, 0, 0);
+        DOMURL.revokeObjectURL(url);
+      };
+      img.src = url;
+
+      this.gridNode = img;
+    } else {
+      this.gridNode?.parentNode?.removeChild(this.gridNode);
+    }
+  }
+
   public paint(screen: Uint8Array) {
     if (this.context) {
       const context = this.context;
@@ -93,16 +129,8 @@ export default class Gfx {
          * at our x and y coordinate paint a a square matching our scale size and fill color
          */
 
-        if (pixel || !this.grid) {
-          context.fillRect(x, y, this.resolution.scale, this.resolution.scale);
-        } else {
-          context.strokeRect(
-            x,
-            y,
-            this.resolution.scale,
-            this.resolution.scale
-          );
-        }
+        context.fillRect(x, y, this.resolution.scale, this.resolution.scale);
+
         return pixel;
       });
     }
