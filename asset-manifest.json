@@ -1,22 +1,15 @@
 {
   "files": {
-    "main.css": "/chip.ts/static/css/main.87e706a8.chunk.css",
-    "main.js": "/chip.ts/static/js/main.d53bd899.chunk.js",
-    "main.js.map": "/chip.ts/static/js/main.d53bd899.chunk.js.map",
-    "runtime-main.js": "/chip.ts/static/js/runtime-main.51269fbe.js",
-    "runtime-main.js.map": "/chip.ts/static/js/runtime-main.51269fbe.js.map",
-    "static/js/2.51f6862c.chunk.js": "/chip.ts/static/js/2.51f6862c.chunk.js",
-    "static/js/2.51f6862c.chunk.js.map": "/chip.ts/static/js/2.51f6862c.chunk.js.map",
-    "static/js/3.84f0e538.chunk.js": "/chip.ts/static/js/3.84f0e538.chunk.js",
-    "static/js/3.84f0e538.chunk.js.map": "/chip.ts/static/js/3.84f0e538.chunk.js.map",
+    "main.css": "/chip.ts/static/css/main.80a34c8f.css",
+    "main.js": "/chip.ts/static/js/main.2ea60a11.js",
+    "static/js/787.ec060fb1.chunk.js": "/chip.ts/static/js/787.ec060fb1.chunk.js",
     "index.html": "/chip.ts/index.html",
-    "static/css/main.87e706a8.chunk.css.map": "/chip.ts/static/css/main.87e706a8.chunk.css.map",
-    "static/js/2.51f6862c.chunk.js.LICENSE.txt": "/chip.ts/static/js/2.51f6862c.chunk.js.LICENSE.txt"
+    "main.80a34c8f.css.map": "/chip.ts/static/css/main.80a34c8f.css.map",
+    "main.2ea60a11.js.map": "/chip.ts/static/js/main.2ea60a11.js.map",
+    "787.ec060fb1.chunk.js.map": "/chip.ts/static/js/787.ec060fb1.chunk.js.map"
   },
   "entrypoints": [
-    "static/js/runtime-main.51269fbe.js",
-    "static/js/2.51f6862c.chunk.js",
-    "static/css/main.87e706a8.chunk.css",
-    "static/js/main.d53bd899.chunk.js"
+    "static/css/main.80a34c8f.css",
+    "static/js/main.2ea60a11.js"
   ]
 }
